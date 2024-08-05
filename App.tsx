@@ -1,5 +1,12 @@
 import {StatusBar} from 'expo-status-bar';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  PermissionsAndroid,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   OPENWEATHERMAP_API_KEY,
@@ -7,12 +14,51 @@ import {
   OPENAI_API_KEY,
   OPENAI_API_URL,
 } from '@env';
-//import Geolocation from '@react-native-community/geolocation';
+import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 
 export default function App() {
   const [weatherData, setWeatherData] = useState<any>({});
   const [frizzForecast, setFrizzForecast] = useState('');
+  const [location, setLocation] = useState<any>({});
+
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Weather or Knot Location Permission',
+          message:
+            'Weather or Knot needs access to your location ' +
+            'so we can provide you with the weather forecast.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the location');
+        //Geolocation.getCurrentPosition(info => console.log(info));
+      } else {
+        console.log('Location permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        setLocation({latitude, longitude});
+        console.log('location', location);
+        fetchData(latitude, longitude);
+      },
+      error => alert('Error'),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
+  };
 
   const fetchData = async (lat: number, lon: number) => {
     try {
@@ -56,7 +102,7 @@ export default function App() {
         },
       );
 
-      const forecast = response.data.choices[0].message.content.trim();
+      const forecast = response.data.choices[0].message.content;
       console.log('forecast', forecast);
       console.log(OPENAI_API_KEY);
       setFrizzForecast(forecast);
@@ -67,28 +113,10 @@ export default function App() {
     }
   };
 
-  // useEffect(() => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       position => {
-  //         const {latitude, longitude} = position.coords;
-  //         fetchData(latitude, longitude);
-  //       },
-  //       error => {
-  //         console.error('Error getting location:', error);
-  //       },
-  //     );
-  //   } else {
-  //     console.error('Geolocation is not supported by this browser.');
-  //   }
-  // }, []);
-
-  // const handleInputChange = (text: string) => {
-  //   setCity(text);
-  // };
-
   const handleSubmit = () => {
-    fetchData(37.7749, -122.4194);
+    requestLocationPermission();
+    getCurrentLocation();
+    //fetchData(37.7749, -122.4194);
   };
 
   const handleHairSubmit = () => {
