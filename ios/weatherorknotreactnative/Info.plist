@@ -74,5 +74,11 @@
     <string>Light</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location to provide weather forecasts based on your location.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need your location to provide weather forecasts based on your location.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We need your location to provide weather forecasts based on your location.</string>
   </dict>
 </plist>
