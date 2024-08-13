@@ -9,9 +9,8 @@ const HairAIComponent = () => {
 
   return (
     <View>
-      <Text>Frizz Forecast</Text>
-      {frizzLoading && <Text>Loading...</Text>}
-      <Text>{frizzForecast}</Text>
+      <Text>Frizz Forecast:</Text>
+      {frizzLoading ? <Text>Loading...</Text> : <Text>{frizzForecast}</Text>}
     </View>
   );
 };
